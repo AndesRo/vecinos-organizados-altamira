@@ -1,7 +1,16 @@
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import {
-    Home, MessageSquare, CalendarDays, BarChart3, FileText, Megaphone,
-    User, Shield, Users, ScrollText, LogOut,
+    Home,
+    MessageSquare,
+    CalendarDays,
+    BarChart3,
+    FileText,
+    Megaphone,
+    User,
+    Shield,
+    Users,
+    ScrollText,
+    LogOut,
 } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 import clsx from "./clsx";
@@ -17,14 +26,31 @@ const nav = [
 ];
 
 export default function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
+    const navigate = useNavigate();
     const { profile, isModerator, isAdmin, signOut } = useAuth();
+
+    async function handleSignOut() {
+        // Cierra también el panel móvil si está abierto.
+        onNavigate?.();
+        try {
+            await signOut();
+        } finally {
+            // Navegamos SIEMPRE, incluso si signOut lanzó una excepción,
+            // para no dejar al usuario con el cartel de "Cuenta no habilitada".
+            navigate("/login", { replace: true });
+        }
+    }
 
     return (
         <div className="flex h-full w-64 flex-col bg-navy text-white">
             <div className="flex items-center gap-2 px-5 py-4">
-                <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-teal font-bold">VA</div>
+                <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-teal font-bold">
+                    VA
+                </div>
                 <div>
-                    <p className="text-sm font-semibold leading-tight">Vecinos Organizados</p>
+                    <p className="text-sm font-semibold leading-tight">
+                        Vecinos Organizados
+                    </p>
                     <p className="text-xs text-teal">Altamira</p>
                 </div>
             </div>
@@ -49,14 +75,18 @@ export default function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
 
                 {isModerator && (
                     <div className="mt-4 space-y-1 border-t border-white/10 pt-3">
-                        <p className="px-3 text-xs uppercase tracking-wider text-slate-400">Moderación</p>
+                        <p className="px-3 text-xs uppercase tracking-wider text-slate-400">
+                            Moderación
+                        </p>
                         <NavLink
                             to="/admin/moderacion"
                             onClick={onNavigate}
                             className={({ isActive }) =>
                                 clsx(
                                     "flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition",
-                                    isActive ? "bg-teal text-white" : "text-slate-200 hover:bg-white/10"
+                                    isActive
+                                        ? "bg-teal text-white"
+                                        : "text-slate-200 hover:bg-white/10"
                                 )
                             }
                         >
@@ -70,7 +100,9 @@ export default function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
                                     className={({ isActive }) =>
                                         clsx(
                                             "flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition",
-                                            isActive ? "bg-teal text-white" : "text-slate-200 hover:bg-white/10"
+                                            isActive
+                                                ? "bg-teal text-white"
+                                                : "text-slate-200 hover:bg-white/10"
                                         )
                                     }
                                 >
@@ -82,7 +114,9 @@ export default function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
                                     className={({ isActive }) =>
                                         clsx(
                                             "flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition",
-                                            isActive ? "bg-teal text-white" : "text-slate-200 hover:bg-white/10"
+                                            isActive
+                                                ? "bg-teal text-white"
+                                                : "text-slate-200 hover:bg-white/10"
                                         )
                                     }
                                 >
@@ -96,11 +130,14 @@ export default function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
 
             <div className="border-t border-white/10 px-3 py-3">
                 <div className="mb-2 px-2">
-                    <p className="truncate text-sm font-medium">{profile?.full_name ?? "Residente"}</p>
+                    <p className="truncate text-sm font-medium">
+                        {profile?.full_name ?? "Residente"}
+                    </p>
                     <p className="text-xs capitalize text-slate-400">{profile?.role}</p>
                 </div>
                 <button
-                    onClick={signOut}
+                    type="button"
+                    onClick={handleSignOut}
                     className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-slate-200 hover:bg-white/10"
                 >
                     <LogOut className="h-4 w-4" /> Cerrar sesión
